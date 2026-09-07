@@ -9,51 +9,61 @@ Unlike long-term memory databases or brute-force token buffers, Anamnesis models
 
 ---
 
-## ⚡ 30-Second Install & Setup
+## ⚡ 30-Second Zero-Install Setup (No git clone needed)
 
-### 1. Installation
+Run Anamnesis instantly via `uvx` (the zero-install runner for Python). If you don't have `uv`, install it in one command:
 ```bash
-git clone https://github.com/momo590/anamnesis.git
-cd anamnesis
-pip install -r requirements.txt
+# macOS/Linux: curl -LsSf https://astral.sh/uv/install.sh | sh
+# Windows: powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
 ---
 
-### 2. Connect to Your AI Clients (Copy-Paste)
+### Connect to Your AI Clients (Copy-Paste)
 
-#### 💻 Claude Code CLI
-Add one hook to your `~/.claude/settings.json`:
+#### 🖥️ Claude Desktop & Cursor (Zero-Install via `uvx`)
+Add directly to your `claude_desktop_config.json`:
+```json
+{
+  "mcpServers": {
+    "anamnesis": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/momo590/anamnesis.git",
+        "anamnesis-mcp"
+      ]
+    }
+  }
+}
+```
+
+#### 🛠️ OpenAI Codex CLI (Zero-Install via `uvx`)
+Add to your `~/.codex/config.toml`:
+```toml
+[mcp_servers.anamnesis]
+command = "uvx"
+args = [
+  "--from",
+  "git+https://github.com/momo590/anamnesis.git",
+  "anamnesis-mcp"
+]
+```
+
+#### 💻 Claude Code CLI (Hook)
+```bash
+git clone https://github.com/momo590/anamnesis.git ~/.anamnesis-core
+```
+Add to `~/.claude/settings.json`:
 ```json
 {
   "hooks": {
     "UserPromptSubmit": [
       {
         "type": "command",
-        "command": "python3 /path/to/anamnesis/integrations/claude_code_hook.py"
+        "command": "python3 ~/.anamnesis-core/integrations/claude_code_hook.py"
       }
     ]
-  }
-}
-```
-
-#### 🛠️ OpenAI Codex CLI
-Add the Anamnesis MCP server to your `~/.codex/config.toml`:
-```toml
-[mcp_servers.anamnesis]
-command = "python3"
-args = ["/path/to/anamnesis/integrations/mcp_server.py"]
-```
-
-#### 🖥️ Claude Desktop & Cursor
-Add to your `claude_desktop_config.json`:
-```json
-{
-  "mcpServers": {
-    "anamnesis": {
-      "command": "python3",
-      "args": ["/path/to/anamnesis/integrations/mcp_server.py"]
-    }
   }
 }
 ```
@@ -61,7 +71,7 @@ Add to your `claude_desktop_config.json`:
 #### 🌐 ChatGPT Desktop & Web (via MCP Connectors)
 1. Go to **Settings** → **Security & Login** → Enable **Developer Mode**.
 2. Under **Connectors / MCP Apps**, select **Add MCP Server**.
-3. Choose **STDIO** or point to your local MCP bridge (`mcp-remote` / FastMCP endpoint).
+3. Point to your local MCP bridge (`uvx --from git+https://github.com/momo590/anamnesis.git anamnesis-mcp`).
 
 #### 🔀 LiteLLM Team Proxy (Transparent to All APIs)
 Add to your `litellm_config.yaml`:
@@ -159,8 +169,8 @@ memory = AnamnesisController(dim=384, decay_rate=0.04)
 v_rule = np.zeros(384, dtype=np.float32)
 v_rule[0] = 1.0
 memory.add_block(
-    block_id="rule_customs_01",
-    content="MANDATORY: Verify EUR.1 origin certificate on all freight.",
+    block_id="rule_security_01",
+    content="CRITICAL: All database endpoints must require TLSv1.3 and mTLS.",
     vector=v_rule,
     pinned=True
 )
@@ -168,7 +178,7 @@ memory.add_block(
 # 2. Track conversational turns
 v_turn = np.zeros(384, dtype=np.float32)
 v_turn[0] = 0.8
-memory.step_interaction(event_text="Check customs rates in Dakar", event_vector=v_turn)
+memory.step_interaction(event_text="Verify ingress controller health", event_vector=v_turn)
 
 # 3. Assemble prompt context within token budget
 prompt_context = memory.assemble_prompt_context(max_tokens=600)
