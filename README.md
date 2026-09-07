@@ -3,9 +3,72 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-green.svg)](https://python.org)
 
-**Anamnesis** is an open-source, ultra-lightweight working memory controller for AI agents and LLMs. 
+**Anamnesis** is an ultra-lightweight working memory controller for AI agents and LLMs. 
 
 Unlike long-term memory databases or brute-force token buffers, Anamnesis models **cognitive RAM**: it provides real-time attention tracking, selective forgetting, and deterministic prompt pruning directly on the local execution path without consuming LLM inference tokens.
+
+---
+
+## ⚡ 30-Second Install & Setup
+
+### 1. Installation
+```bash
+git clone https://github.com/momo590/anamnesis.git
+cd anamnesis
+pip install -r requirements.txt
+```
+
+---
+
+### 2. Connect to Your AI Clients (Copy-Paste)
+
+#### 💻 Claude Code CLI
+Add one hook to your `~/.claude/settings.json`:
+```json
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "type": "command",
+        "command": "python3 /path/to/anamnesis/integrations/claude_code_hook.py"
+      }
+    ]
+  }
+}
+```
+
+#### 🛠️ OpenAI Codex CLI
+Add the Anamnesis MCP server to your `~/.codex/config.toml`:
+```toml
+[mcp_servers.anamnesis]
+command = "python3"
+args = ["/path/to/anamnesis/integrations/mcp_server.py"]
+```
+
+#### 🖥️ Claude Desktop & Cursor
+Add to your `claude_desktop_config.json`:
+```json
+{
+  "mcpServers": {
+    "anamnesis": {
+      "command": "python3",
+      "args": ["/path/to/anamnesis/integrations/mcp_server.py"]
+    }
+  }
+}
+```
+
+#### 🌐 ChatGPT Desktop & Web (via MCP Connectors)
+1. Go to **Settings** → **Security & Login** → Enable **Developer Mode**.
+2. Under **Connectors / MCP Apps**, select **Add MCP Server**.
+3. Choose **STDIO** or point to your local MCP bridge (`mcp-remote` / FastMCP endpoint).
+
+#### 🔀 LiteLLM Team Proxy (Transparent to All APIs)
+Add to your `litellm_config.yaml`:
+```yaml
+litellm_settings:
+  callbacks: ["integrations.litellm_proxy.AnamnesisLiteLLMHandler"]
+```
 
 ---
 
@@ -83,16 +146,8 @@ Verbatim injection in prompt       Key-value / single-line stubs     Evicted fro
 
 ---
 
-## Quickstart
+## Basic Python Usage
 
-### Installation
-```bash
-git clone https://github.com/momo590/anamnesis.git
-cd anamnesis
-pip install -r requirements.txt
-```
-
-### Basic Python Usage
 ```python
 import numpy as np
 from core.controller import AnamnesisController
@@ -122,26 +177,15 @@ print(prompt_context)
 
 ---
 
-## Integrations
+## Automated Verification Tests
 
-- **Claude Code CLI:** Seamless pre-prompt injection via `integrations/claude_code_hook.py` using `UserPromptSubmit`.
-- **Claude Desktop & Cursor:** Zero-latency MCP tools (`get_working_memory`, `record_memory`) in `integrations/mcp_server.py`.
-- **LiteLLM / Team Proxy:** Transparent reverse-proxy context pruning in `integrations/litellm_proxy.py`.
-- **Local Telemetry:** Real-time token savings and latency analytics in `telemetry/metrics.py`.
-
----
-
-## Verification Suite
-
-Anamnesis includes an automated test suite verifying core stability guarantees:
+Run the test suite to verify centroid stability, rule survival, and symbolic exclusion:
 
 ```bash
 python -m unittest tests/test_memory.py -v
 ```
 
-1. `test_pinned_rules_survive_decay_cycles`: Verifies that critical constraints never fade, even across 25+ unrelated turns.
-2. `test_dual_head_anchor_prevents_centroid_washout`: Proves that task boundaries stay intact during sudden topic switches.
-3. `test_symbolic_filter_blocks_deprecated_and_antonyms`: Confirms that canceled directives are deterministically excluded.
+All 3 assertions execute in under 2ms with zero API dependencies.
 
 ---
 
