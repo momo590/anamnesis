@@ -5,7 +5,7 @@ from core.controller import AnamnesisController
 from telemetry.metrics import TelemetryTracker
 
 
-def run_logistics_agent_simulation():
+def run_cloud_ops_agent_simulation():
     print("=" * 60)
     print("ANAMNESIS: Cognitive Working Memory Simulation")
     print("=" * 60)
@@ -15,33 +15,33 @@ def run_logistics_agent_simulation():
     memory = AnamnesisController(dim=dim, decay_rate=0.08)
     telemetry = TelemetryTracker(db_path="simulation_telemetry.db")
 
-    # 1. Register Pinned Invariant (e.g. Customs compliance rule)
-    v_customs = np.zeros(dim, dtype=np.float32)
-    v_customs[0] = 1.0  # Domain axis: customs & compliance
+    # 1. Register Pinned Invariant (e.g. Mandatory Infrastructure Security Policy)
+    v_security = np.zeros(dim, dtype=np.float32)
+    v_security[0] = 1.0  # Domain axis: Security & Compliance
 
     memory.add_block(
-        block_id="rule_customs_01",
-        content="CRITICAL: All shipments over 1000 EUR require EUR.1 Certificate of Origin.",
-        vector=v_customs,
+        block_id="rule_security_01",
+        content="CRITICAL SECURITY POLICY: All database endpoints must require TLSv1.3 and mTLS.",
+        vector=v_security,
         pinned=True,
     )
-    print("\n[+] Registered Pinned Rule: EUR.1 certificate requirement.")
+    print("\n[+] Registered Pinned Invariant: Database TLS enforcement.")
 
-    # 2. Simulate 10 turns of active dialogue with topic drift
-    v_freight = np.zeros(dim, dtype=np.float32)
-    v_freight[0] = 0.8
-    v_freight[1] = 0.2
+    # 2. Simulate dialogue with task execution and topic drift
+    v_infra = np.zeros(dim, dtype=np.float32)
+    v_infra[0] = 0.8
+    v_infra[1] = 0.2
 
-    v_css = np.zeros(dim, dtype=np.float32)
-    v_css[10] = 1.0  # Completely unrelated topic: web development styling
+    v_frontend = np.zeros(dim, dtype=np.float32)
+    v_frontend[10] = 1.0  # Disparate topic: UI / Frontend styling
 
     turns = [
-        ("Quote freight rate for 2 pallets to Dakar", v_freight, False),
-        ("Include port handling and demurrage", v_freight, False),
-        ("What about terminal handling charges?", v_freight, False),
-        ("Can you change the dashboard button to dark blue?", v_css, True),  # Topic shift
-        ("Add a hover effect on the tracking card", v_css, False),
-        ("Also adjust the CSS grid layout", v_css, False),
+        ("Scale Kubernetes worker pool to 10 nodes", v_infra, False),
+        ("Verify ingress controller health check latency", v_infra, False),
+        ("Check memory utilization across pod replica sets", v_infra, False),
+        ("Can you change the dashboard button to dark blue?", v_frontend, True),  # Topic shift
+        ("Add a hover animation on the telemetry card", v_frontend, False),
+        ("Also adjust the CSS grid layout for mobile viewports", v_frontend, False),
     ]
 
     for turn_idx, (user_prompt, vec, shift) in enumerate(turns, 1):
@@ -80,4 +80,4 @@ def run_logistics_agent_simulation():
 
 
 if __name__ == "__main__":
-    run_logistics_agent_simulation()
+    run_cloud_ops_agent_simulation()
