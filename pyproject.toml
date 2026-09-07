@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "anamnesis"
+version = "0.1.0"
+description = "Cognitive Working Memory & Selective Attention Controller for AI Agents"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Makhtar DIOP" }
+]
+dependencies = [
+    "numpy>=1.24.0",
+    "mcp[cli]>=1.0.0",
+    "pydantic>=2.0.0",
+    "fastembed>=0.2.0"
+]
+
+[project.scripts]
+anamnesis-mcp = "integrations.mcp_server:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["core*", "integrations*", "telemetry*"]
