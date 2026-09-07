@@ -1,7 +1,7 @@
 """Model Context Protocol (MCP) Server for Anamnesis.
 
-Exposes tools for Claude Desktop, Cursor, and MCP clients to query and record
-working memory with selective forgetting.
+Exposes tools for Claude Desktop, Cursor, Codex CLI, and MCP clients to query
+and record working memory with selective forgetting.
 """
 
 from __future__ import annotations
@@ -21,7 +21,6 @@ logger = logging.getLogger("anamnesis.mcp")
 mcp = FastMCP("anamnesis-memory")
 
 # Shared global controller instance
-# In production, this coordinates with persistent storage (SQLite/VSS)
 controller = AnamnesisController(dim=384)
 
 
@@ -51,9 +50,7 @@ def record_memory(
         is_task_shift: True if the user switched macro objectives.
         status: 'active' or 'deprecated'.
     """
-    # Deterministic fallback vector generation if embedder is offline
     synthetic_vec = np.zeros(384, dtype=np.float32)
-    # Simple deterministic hash projection for zero-dep MCP bootstrap
     for i, char in enumerate(content[:384]):
         synthetic_vec[i % 384] += (ord(char) % 100) / 100.0
     norm = np.linalg.norm(synthetic_vec)
@@ -86,5 +83,10 @@ def inspect_attention_anchor() -> str:
     }, indent=2)
 
 
-if __name__ == "__main__":
+def main():
+    """CLI entrypoint for standalone and uvx execution."""
     mcp.run()
+
+
+if __name__ == "__main__":
+    main()
